@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-page: #f0eeea;
+  --bg-header: #fefce8;
+  --bg-card: #fafaf9;
+  --bg-card-tint: #fffbeb;
+  --border: #d4d1cc;
+  --border-strong: #c4bfb8;
+  --text: #1c1917;
+  --text-muted: #57534e;
+  --accent: #d97706;
+  --accent-hover: #b45309;
+  --progress-bg: #fef3c7;
+  --progress-fill: #d97706;
+}
+
+
+.dark {
+  --bg-page: #1c1917;
+  --bg-header: #292524;
+  --bg-card: #292524;
+  --bg-card-tint: #44403c;
+  --border: #44403c;
+  --border-strong: #57534e;
+  --text: #fafaf9;
+  --text-muted: #a8a29e;
+  --accent: #fbbf24;
+  --accent-hover: #fcd34d;
+  --progress-bg: #44403c;
+  --progress-fill: #fbbf24;
+}
+
+body {
+  color: var(--text);
+  background: var(--bg-page);
+  font-feature-settings: "ss01", "ss02";
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.progress-fill {
+  transition: width 0.25s ease-out;
+}

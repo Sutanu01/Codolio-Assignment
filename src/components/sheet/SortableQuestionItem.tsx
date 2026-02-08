@@ -89,15 +89,21 @@ export function SortableQuestionItem({
 
   return (
     <li
-      ref={setNodeRef}
-      style={style}
       className={cn(
-        "group flex flex-wrap items-center gap-2 rounded-md border border-transparent py-1.5 px-2 transition-colors",
-        "hover:border-ink-200 hover:bg-white dark:hover:border-ink-600 dark:hover:bg-ink-700/50",
-        status === "done" && "opacity-75",
-        isDragging && "z-30 bg-white opacity-90 shadow-card dark:bg-ink-700"
+        "relative transition-[height] duration-150",
+        isDragging && "h-0 min-h-0 overflow-hidden"
       )}
     >
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "group flex flex-wrap items-center gap-2 rounded-md border border-transparent py-1.5 px-2 transition-colors",
+          "hover:border-ink-200 hover:bg-white dark:hover:border-ink-600 dark:hover:bg-ink-700/50",
+          status === "done" && "opacity-75",
+          isDragging && "z-30 bg-white opacity-90 shadow-card dark:bg-ink-700"
+        )}
+      >
       <button
         className="touch-none shrink-0 cursor-grab active:cursor-grabbing rounded p-0.5 text-ink-400 hover:text-ink-600 dark:text-ink-500 dark:hover:text-ink-300"
         {...attributes}
@@ -246,6 +252,7 @@ export function SortableQuestionItem({
         confirmLabel="Delete question"
         onConfirm={() => deleteQuestion(topicId, subTopicId, question.id)}
       />
+      </div>
     </li>
   );
 }

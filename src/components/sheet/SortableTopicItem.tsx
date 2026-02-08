@@ -71,14 +71,23 @@ export function SortableTopicItem({ topic, index }: SortableTopicItemProps) {
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={cn(
-        "rounded-lg border shadow-card transition-shadow dark:border-ink-600 dark:bg-ink-800",
-        tintClass,
-        isDragging && "opacity-85 shadow-cardHover z-50"
+        "relative transition-[height] duration-150",
+        isDragging && "h-0 min-h-0"
       )}
     >
+      <div
+        ref={setNodeRef}
+        style={{
+          ...style,
+          ...(isDragging ? { position: "absolute" as const, left: 0, top: 0, width: "100%" } : {}),
+        }}
+        className={cn(
+          "rounded-lg border shadow-card transition-shadow dark:border-ink-600 dark:bg-ink-800",
+          tintClass,
+          isDragging && "opacity-85 shadow-cardHover z-50"
+        )}
+      >
       <div className="flex items-center gap-2 border-b border-ink-100 px-4 py-3 dark:border-ink-600">
         <button
           type="button"
@@ -198,6 +207,7 @@ export function SortableTopicItem({ topic, index }: SortableTopicItemProps) {
         confirmLabel="Delete topic"
         onConfirm={() => deleteTopic(topic.id)}
       />
+      </div>
     </div>
   );
 }

@@ -58,13 +58,19 @@ export function SortableSubTopicItem({ topicId, subTopic }: SortableSubTopicItem
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={cn(
-        "rounded-md border border-ink-200 bg-white/70 shadow-sm dark:border-ink-600 dark:bg-ink-700/40",
-        isDragging && "z-40 opacity-85 shadow-card"
+        "relative transition-[height] duration-150",
+        isDragging && "h-0 min-h-0 overflow-hidden"
       )}
     >
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "rounded-md border border-ink-200 bg-white/70 shadow-sm dark:border-ink-600 dark:bg-ink-700/40",
+          isDragging && "z-40 opacity-85 shadow-card"
+        )}
+      >
       <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2 dark:border-ink-600">
         <button
           className="touch-none cursor-grab active:cursor-grabbing rounded p-0.5 text-ink-400 hover:text-ink-600 dark:text-ink-500 dark:hover:text-ink-300"
@@ -179,6 +185,7 @@ export function SortableSubTopicItem({ topicId, subTopic }: SortableSubTopicItem
         confirmLabel="Delete sub-topic"
         onConfirm={() => deleteSubTopic(topicId, subTopic.id)}
       />
+      </div>
     </div>
   );
 }

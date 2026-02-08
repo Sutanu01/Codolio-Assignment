@@ -1,11 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { SubTopic } from "@/types/sheet";
 import { cn } from "@/lib/utils";
 import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { useSheetStore } from "@/store/sheet-store";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { QuestionList } from "./QuestionList";
@@ -33,10 +33,9 @@ export function SortableSubTopicItem({ topicId, subTopic }: SortableSubTopicItem
 
   const { updateSubTopic, deleteSubTopic, addQuestion } = useSheetStore();
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = isDragging
+    ? { transition }
+    : { transform: CSS.Transform.toString(transform), transition };
 
   function handleSaveSubTopic() {
     const t = title.trim();
@@ -58,17 +57,17 @@ export function SortableSubTopicItem({ topicId, subTopic }: SortableSubTopicItem
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={cn(
-        "relative transition-[height] duration-150",
-        isDragging && "h-0 min-h-0 overflow-hidden"
+        "relative w-full",
+        isDragging && "h-0 min-h-0 overflow-hidden !m-0 border-0 p-0"
       )}
     >
       <div
-        ref={setNodeRef}
-        style={style}
         className={cn(
           "rounded-md border border-ink-200 bg-white/70 shadow-sm dark:border-ink-600 dark:bg-ink-700/40",
-          isDragging && "z-40 opacity-85 shadow-card"
+          isDragging && "opacity-0 pointer-events-none"
         )}
       >
       <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2 dark:border-ink-600">

@@ -1,11 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Topic } from "@/types/sheet";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { useSheetStore } from "@/store/sheet-store";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { SubTopicList } from "./SubTopicList";
@@ -47,10 +47,9 @@ export function SortableTopicItem({ topic, index }: SortableTopicItemProps) {
   const questionCount = countQuestions(topic);
   const tintClass = LIGHT_CARD_TINTS[index % LIGHT_CARD_TINTS.length];
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = isDragging
+    ? { transition }
+    : { transform: CSS.Transform.toString(transform), transition };
 
   function handleSaveTopic() {
     const t = title.trim();
@@ -71,21 +70,18 @@ export function SortableTopicItem({ topic, index }: SortableTopicItemProps) {
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={cn(
-        "relative transition-[height] duration-150",
-        isDragging && "h-0 min-h-0"
+        "relative w-full",
+        isDragging && "h-0 min-h-0 overflow-hidden !m-0 border-0 p-0"
       )}
     >
       <div
-        ref={setNodeRef}
-        style={{
-          ...style,
-          ...(isDragging ? { position: "absolute" as const, left: 0, top: 0, width: "100%" } : {}),
-        }}
         className={cn(
           "rounded-lg border shadow-card transition-shadow dark:border-ink-600 dark:bg-ink-800",
           tintClass,
-          isDragging && "opacity-85 shadow-cardHover z-50"
+          isDragging && "opacity-0 pointer-events-none"
         )}
       >
       <div className="flex items-center gap-2 border-b border-ink-100 px-4 py-3 dark:border-ink-600">

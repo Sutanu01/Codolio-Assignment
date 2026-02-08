@@ -5,6 +5,7 @@ import { useSheetStore } from "@/store/sheet-store";
 import { SortableTopicList } from "./SortableTopicList";
 import { getSheetProgress } from "@/lib/progress";
 import { useTheme } from "@/components/ThemeProvider";
+import { sampleSheet } from "@/data/sample-sheet";
 import { Moon, Plus, Sun } from "lucide-react";
 
 export function SheetView() {
@@ -19,14 +20,21 @@ export function SheetView() {
 
   useEffect(() => {
     fetch("/api/sheet")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load sheet");
-        return res.json();
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg = (data && typeof data.error === "string") ? data.error : "Failed to load sheet";
+          throw new Error(msg);
+        }
+        return data;
       })
       .then((data) => {
         setSheet(data);
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        setSheet(JSON.parse(JSON.stringify(sampleSheet)));
+        setError(null);
+      })
       .finally(() => setLoading(false));
   }, [setSheet]);
 

@@ -1,11 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Question, QuestionStatus } from "@/types/sheet";
 import { cn } from "@/lib/utils";
 import { Check, ExternalLink, GripVertical, Pencil, Trash2, X } from "lucide-react";
-import { useState } from "react";
 import { useSheetStore } from "@/store/sheet-store";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
@@ -56,10 +56,9 @@ export function SortableQuestionItem({
 
   const status = question.status ?? "todo";
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = isDragging
+    ? { transition }
+    : { transform: CSS.Transform.toString(transform), transition };
 
   function handleSave() {
     const t = title.trim();
@@ -89,19 +88,19 @@ export function SortableQuestionItem({
 
   return (
     <li
+      ref={setNodeRef}
+      style={style}
       className={cn(
-        "relative transition-[height] duration-150",
-        isDragging && "h-0 min-h-0 overflow-hidden"
+        "relative w-full",
+        isDragging && "h-0 min-h-0 overflow-hidden !m-0 border-0 p-0"
       )}
     >
       <div
-        ref={setNodeRef}
-        style={style}
         className={cn(
           "group flex flex-wrap items-center gap-2 rounded-md border border-transparent py-1.5 px-2 transition-colors",
           "hover:border-ink-200 hover:bg-white dark:hover:border-ink-600 dark:hover:bg-ink-700/50",
           status === "done" && "opacity-75",
-          isDragging && "z-30 bg-white opacity-90 shadow-card dark:bg-ink-700"
+          isDragging && "opacity-0 pointer-events-none"
         )}
       >
       <button

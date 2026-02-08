@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   DndContext,
   DragOverlay,
-  closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -12,7 +11,13 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { restrictToVerticalAxis, restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { sortableListCollision } from "@/lib/sortable-collision";
+import { clampVerticalDrag } from "@/lib/sortable-modifiers";
+import {
+  restrictToVerticalAxis,
+  restrictToWindowEdges,
+  restrictToFirstScrollableAncestor,
+} from "@dnd-kit/modifiers";
 import {
   SortableContext,
   sortableKeyboardCoordinates,
@@ -30,21 +35,17 @@ const STATUS_LABEL: Record<QuestionStatus, string> = {
   done: "Done",
 };
 
-function QuestionDragPreview({ question }: { question: Question }) {
+function QuestionOverlay({ question }: { question: Question }) {
   const status = question.status ?? "todo";
   const tags = question.tags ?? [];
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-md border border-ink-200 bg-white py-1.5 px-2 shadow-card dark:border-ink-600 dark:bg-ink-700">
-      <span className="rounded p-0.5 text-ink-400 dark:text-ink-500">
-        <GripVertical className="h-3.5 w-3.5" />
-      </span>
+    <div className="w-full min-w-[200px] max-w-[min(100vw-2rem,42rem)] flex flex-wrap items-center gap-2 rounded-md border border-ink-200 bg-white py-1.5 px-2 shadow-lg dark:border-ink-600 dark:bg-ink-700">
+      <GripVertical className="h-3.5 w-3.5 shrink-0 text-ink-400 dark:text-ink-500" />
       <span
         className={cn(
           "rounded border px-1.5 py-0.5 text-xs font-medium",
-          status === "done" &&
-            "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-          status !== "done" &&
-            "border-ink-200 bg-ink-50 text-ink-600 dark:border-ink-600 dark:bg-ink-700 dark:text-ink-300"
+          status === "done" && "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+          status !== "done" && "border-ink-200 bg-ink-50 text-ink-600 dark:border-ink-600 dark:bg-ink-700 dark:text-ink-300"
         )}
       >
         {status === "done" ? <Check className="h-3 w-3" /> : STATUS_LABEL[status]}
@@ -53,10 +54,7 @@ function QuestionDragPreview({ question }: { question: Question }) {
       {tags.length > 0 && (
         <span className="flex gap-1">
           {tags.slice(0, 3).map((t) => (
-            <span
-              key={t}
-              className="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-600 dark:text-ink-300"
-            >
+            <span key={t} className="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-600 dark:text-ink-300">
               {t}
             </span>
           ))}
@@ -82,8 +80,8 @@ export function QuestionList({ topicId, subTopicId, questions }: QuestionListPro
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  function handleDragStart(event: DragStartEvent) {
-    setActiveId(event.active.id as string);
+  function handleDragStart(e: DragStartEvent) {
+    setActiveId(e.active.id as string);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -107,13 +105,18 @@ export function QuestionList({ topicId, subTopicId, questions }: QuestionListPro
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={sortableListCollision}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+      modifiers={[
+        restrictToVerticalAxis,
+        restrictToFirstScrollableAncestor,
+        restrictToWindowEdges,
+        clampVerticalDrag,
+      ]}
     >
       <SortableContext items={questionIds} strategy={verticalListSortingStrategy}>
-        <ul className="space-y-1">
+        <ul className="space-y-2">
           {questions.map((q) => (
             <SortableQuestionItem
               key={q.id}
@@ -125,7 +128,7 @@ export function QuestionList({ topicId, subTopicId, questions }: QuestionListPro
         </ul>
       </SortableContext>
       <DragOverlay dropAnimation={null}>
-        {activeQuestion ? <QuestionDragPreview question={activeQuestion} /> : null}
+        {activeQuestion ? <QuestionOverlay question={activeQuestion} /> : null}
       </DragOverlay>
     </DndContext>
   );

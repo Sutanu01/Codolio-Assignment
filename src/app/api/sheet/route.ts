@@ -8,10 +8,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { sampleSheet } from "@/data/sample-sheet";
 import type { Sheet } from "@/types/sheet";
 
-let sheetData: Sheet = { ...sampleSheet };
+let sheetData: Sheet = JSON.parse(JSON.stringify(sampleSheet));
 
 export async function GET() {
-  return NextResponse.json(sheetData);
+  try {
+    return NextResponse.json(sheetData);
+  } catch (err) {
+    console.error("GET /api/sheet error:", err);
+    return NextResponse.json(
+      { error: "Failed to load sheet" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
